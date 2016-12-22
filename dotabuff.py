@@ -27,11 +27,13 @@ class Series(object):
         """ These are mostly hardcoded references and the most likely thing to break.
             Each "series" data contains 9 <td> elements which contain the info we extract.
         """
+        self.data = data
+        # TODO: Handle games that are in a TBA state (8 <td> results)
         self.winner = data[3].find_all('div')[-1].string
-        if self.winner == 'Tied':
+        if self.winner in ['Tied', 'TBA']:
             data.insert(3, 'Dummy element to normalize results...')
             self.winner = None
-        assert len(data) == 9, 'Something in the dotabuff results page changed. Update the parser.'
+        assert len(data) == 9, 'The dotabuff results page has changed, update API.\n%s' % self.data
         self.league_id = data[0].find_next('img')['title']
         self.start_time = data[2].find_next('time')['datetime']
         self.max_games = int(data[1].find_next('a').string[-1])
